@@ -154,6 +154,13 @@ function setupEventListeners() {
     // Export & Clear
     elements.exportBtn.addEventListener('click', exportToCSV);
     elements.clearBtn.addEventListener('click', clearAllData);
+    
+    // Backup & Restore
+    document.getElementById('backup-btn').addEventListener('click', backupData);
+    document.getElementById('restore-btn').addEventListener('click', () => {
+        document.getElementById('restore-file').click();
+    });
+    document.getElementById('restore-file').addEventListener('change', restoreData);
 }
 
 // Modal Functions
@@ -434,6 +441,61 @@ function clearAllData() {
         saveToStorage();
         renderAll();
     }
+}
+
+// Backup data to JSON file
+function backupData() {
+    const data = {
+        transactions: APP_STATE.transactions,
+        wishlist: APP_STATE.wishlist,
+        exchangeRate: APP_STATE.exchangeRate,
+        exportedAt: new Date().toISOString()
+    };
+    
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `trip-tracker-backup-${new Date().toISOString().split('T')[0]}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+    
+    alert('Backup berhasil! File JSON sudah didownload.');
+}
+
+// Restore data from JSON file
+function restoreData(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    
+    const reader = new FileReader();
+    reader.onload = function(event) {
+        try {
+            const data = JSON.parse(event.target.result);
+            
+            if (confirm(`Restore data dari backup?\n\nTransaksi: ${data.transactions?.length || 0}\nWishlist: ${data.wishlist?.length || 0}\n\nData saat ini akan ditimpa.`)) {
+                APP_STATE.transactions = data.transactions || [];
+                APP_STATE.wishlist = data.wishlist || [];
+                if (data.exchangeRate) {
+                    APP_STATE.exchangeRate = data.exchangeRate;
+                }
+                
+                saveToStorage();
+                renderAll();
+                renderWishlistSummary();
+                renderWishlist();
+                
+                alert('Data berhasil di-restore!');
+            }
+        } catch (err) {
+            alert('Error: File tidak valid atau rusak.');
+            console.error(err);
+        }
+    };
+    reader.readAsText(file);
+    
+    // Reset file input
+    e.target.value = '';
 }
 
 // Utility Functions
