@@ -1,10 +1,10 @@
-const CACHE_NAME = 'trip-tracker-v1';
+const CACHE_NAME = 'trip-tracker-v2';
 const ASSETS_TO_CACHE = [
-    '/',
-    '/index.html',
-    '/style.css',
-    '/app.js',
-    '/manifest.json'
+    './',
+    './index.html',
+    './style.css',
+    './app.js',
+    './manifest.json'
 ];
 
 // Install event - cache assets
