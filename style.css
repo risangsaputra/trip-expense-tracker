@@ -627,18 +627,56 @@ body {
 /* Export Section - iOS Style */
 .export-section {
     padding: 24px 16px;
-    display: grid;
-    grid-template-columns: 1fr 1fr;
+    margin-top: 20px;
+}
+
+.export-section h3 {
+    font-size: 0.8rem;
+    color: var(--gray-500);
+    font-weight: 600;
+    margin-bottom: 14px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.button-group {
+    display: flex;
     gap: 10px;
+    margin-bottom: 12px;
 }
 
-.export-section .btn {
-    font-size: 0.85rem;
-    padding: 14px 12px;
+.button-group .btn {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    padding: 16px 10px;
+    font-size: 0.8rem;
 }
 
-.export-section .btn-danger {
-    grid-column: 1 / -1;
+.btn-icon-left {
+    font-size: 1.2rem;
+}
+
+.export-section > .btn {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 14px;
+    font-size: 0.9rem;
+}
+
+.btn-danger-outline {
+    color: var(--danger);
+    border: 1.5px solid rgba(255, 59, 48, 0.3);
+    background: rgba(255, 59, 48, 0.05);
+}
+
+.btn-danger-outline:active {
+    background: rgba(255, 59, 48, 0.1);
 }
 
 /* Date grouping */
