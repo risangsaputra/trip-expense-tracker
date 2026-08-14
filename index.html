@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#1e40af">
+    <meta name="description" content="Trip Expense Tracker - Santa Clara Trip">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Trip Tracker">
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="icons/icon-192.png">
+    <title>Santa Clara Trip Tracker</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="app">
+        <!-- Header -->
+        <header class="header">
+            <h1>🇺🇸 Santa Clara Trip</h1>
+            <div class="exchange-rate">
+                <span id="rate-display">Loading rate...</span>
+                <button id="refresh-rate" class="btn-icon" title="Refresh rate">🔄</button>
+            </div>
+        </header>
+
+        <!-- Summary Cards -->
+        <section class="summary">
+            <div class="card income">
+                <span class="label">Pemasukan</span>
+                <span class="amount" id="total-income">$0.00</span>
+                <span class="amount-idr" id="total-income-idr">Rp 0</span>
+            </div>
+            <div class="card expense">
+                <span class="label">Pengeluaran</span>
+                <span class="amount" id="total-expense">$0.00</span>
+                <span class="amount-idr" id="total-expense-idr">Rp 0</span>
+            </div>
+            <div class="card balance">
+                <span class="label">Saldo</span>
+                <span class="amount" id="total-balance">$0.00</span>
+                <span class="amount-idr" id="total-balance-idr">Rp 0</span>
+            </div>
+        </section>
+
+        <!-- Add Transaction Button -->
+        <button class="fab" id="add-btn" title="Tambah Transaksi">+</button>
+
+        <!-- Transaction Form Modal -->
+        <div class="modal" id="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2 id="modal-title">Tambah Transaksi</h2>
+                    <button class="btn-close" id="close-modal">&times;</button>
+                </div>
+                <form id="transaction-form">
+                    <input type="hidden" id="transaction-id">
+                    
+                    <div class="form-group">
+                        <label>Tipe</label>
+                        <div class="toggle-group">
+                            <button type="button" class="toggle-btn active" data-type="expense">Pengeluaran</button>
+                            <button type="button" class="toggle-btn" data-type="income">Pemasukan</button>
+                        </div>
+                        <input type="hidden" id="type" value="expense">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="description">Deskripsi</label>
+                        <input type="text" id="description" placeholder="Contoh: Makan siang" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="amount">Jumlah</label>
+                        <div class="input-with-currency">
+                            <input type="number" id="amount" placeholder="0.00" step="0.01" min="0" required>
+                            <select id="currency">
+                                <option value="USD">USD</option>
+                                <option value="IDR">IDR</option>
+                            </select>
+                        </div>
+                        <span class="converted-amount" id="converted-preview"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="category">Kategori</label>
+                        <select id="category">
+                            <option value="food">🍔 Makan</option>
+                            <option value="transport">🚗 Transport</option>
+                            <option value="shopping">🛍️ Belanja</option>
+                            <option value="accommodation">🏨 Akomodasi</option>
+                            <option value="entertainment">🎬 Hiburan</option>
+                            <option value="other">📦 Lainnya</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="date">Tanggal</label>
+                        <input type="date" id="date" required>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-secondary" id="cancel-btn">Batal</button>
+                        <button type="submit" class="btn btn-primary">Simpan</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Filter & Category Summary -->
+        <section class="filters">
+            <div class="filter-row">
+                <select id="filter-category">
+                    <option value="all">Semua Kategori</option>
+                    <option value="food">🍔 Makan</option>
+                    <option value="transport">🚗 Transport</option>
+                    <option value="shopping">🛍️ Belanja</option>
+                    <option value="accommodation">🏨 Akomodasi</option>
+                    <option value="entertainment">🎬 Hiburan</option>
+                    <option value="other">📦 Lainnya</option>
+                </select>
+                <select id="filter-type">
+                    <option value="all">Semua Tipe</option>
+                    <option value="expense">Pengeluaran</option>
+                    <option value="income">Pemasukan</option>
+                </select>
+            </div>
+        </section>
+
+        <!-- Category Breakdown -->
+        <section class="category-breakdown" id="category-breakdown">
+            <h3>Pengeluaran per Kategori</h3>
+            <div class="category-list" id="category-list"></div>
+        </section>
+
+        <!-- Transaction List -->
+        <section class="transactions">
+            <h3>Riwayat Transaksi</h3>
+            <div class="transaction-list" id="transaction-list">
+                <p class="empty-state">Belum ada transaksi. Tap + untuk menambah.</p>
+            </div>
+        </section>
+
+        <!-- Export Button -->
+        <section class="export-section">
+            <button class="btn btn-outline" id="export-btn">📊 Export ke CSV</button>
+            <button class="btn btn-outline btn-danger" id="clear-btn">🗑️ Hapus Semua Data</button>
+        </section>
+    </div>
+
+    <!-- Wishlist Tab Button -->
+    <nav class="bottom-nav">
+        <button class="nav-btn active" data-tab="expenses">
+            <span class="nav-icon">💰</span>
+            <span class="nav-label">Expenses</span>
+        </button>
+        <button class="nav-btn" data-tab="wishlist">
+            <span class="nav-icon">🛒</span>
+            <span class="nav-label">Wishlist</span>
+        </button>
+    </nav>
+
+    <!-- Wishlist Page -->
+    <div class="wishlist-page" id="wishlist-page">
+        <header class="header">
+            <h1>🛒 Shopping Wishlist</h1>
+            <p class="subtitle">Products to buy in US</p>
+        </header>
+
+        <!-- Wishlist Summary -->
+        <section class="wishlist-summary">
+            <div class="card">
+                <span class="label">Total Items</span>
+                <span class="amount" id="wishlist-count">0</span>
+            </div>
+            <div class="card">
+                <span class="label">Est. Budget</span>
+                <span class="amount" id="wishlist-total">$0</span>
+                <span class="amount-idr" id="wishlist-total-idr">Rp 0</span>
+            </div>
+            <div class="card">
+                <span class="label">Purchased</span>
+                <span class="amount" id="wishlist-purchased">0</span>
+            </div>
+        </section>
+
+        <!-- Add Wishlist Button -->
+        <button class="fab" id="add-wishlist-btn" title="Tambah Item">+</button>
+
+        <!-- Wishlist Modal -->
+        <div class="modal" id="wishlist-modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2 id="wishlist-modal-title">Tambah Item</h2>
+                    <button class="btn-close" id="close-wishlist-modal">&times;</button>
+                </div>
+                <form id="wishlist-form">
+                    <input type="hidden" id="wishlist-item-id">
+                    
+                    <div class="form-group">
+                        <label for="product-name">Nama Produk</label>
+                        <input type="text" id="product-name" placeholder="Contoh: iPhone 16 Pro" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="product-store">Toko/Website</label>
+                        <input type="text" id="product-store" placeholder="Contoh: Apple Store, Amazon, Best Buy">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="product-price">Estimasi Harga (USD)</label>
+                        <input type="number" id="product-price" placeholder="0.00" step="0.01" min="0">
+                        <span class="converted-amount" id="product-price-preview"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="product-link">Link Produk (opsional)</label>
+                        <input type="url" id="product-link" placeholder="https://...">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="product-priority">Prioritas</label>
+                        <select id="product-priority">
+                            <option value="high">🔴 Wajib Beli</option>
+                            <option value="medium" selected>🟡 Kalau Ada Budget</option>
+                            <option value="low">🟢 Nice to Have</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="product-notes">Catatan</label>
+                        <textarea id="product-notes" placeholder="Warna, ukuran, spesifikasi..." rows="2"></textarea>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-secondary" id="cancel-wishlist-btn">Batal</button>
+                        <button type="submit" class="btn btn-primary">Simpan</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Filter Wishlist -->
+        <section class="filters">
+            <div class="filter-row">
+                <select id="filter-priority">
+                    <option value="all">Semua Prioritas</option>
+                    <option value="high">🔴 Wajib Beli</option>
+                    <option value="medium">🟡 Kalau Ada Budget</option>
+                    <option value="low">🟢 Nice to Have</option>
+                </select>
+                <select id="filter-status">
+                    <option value="all">Semua Status</option>
+                    <option value="pending">Belum Dibeli</option>
+                    <option value="purchased">Sudah Dibeli</option>
+                </select>
+            </div>
+        </section>
+
+        <!-- Wishlist Items -->
+        <section class="wishlist-items">
+            <h3>Daftar Wishlist</h3>
+            <div class="wishlist-list" id="wishlist-list">
+                <p class="empty-state">Belum ada wishlist. Tap + untuk menambah.</p>
+            </div>
+        </section>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
