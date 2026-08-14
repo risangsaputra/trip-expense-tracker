@@ -1,7 +1,7 @@
 {
-    "name": "Santa Clara Trip Expense Tracker",
-    "short_name": "Trip Tracker",
-    "description": "Track expenses during your Santa Clara trip with real-time USD-IDR conversion",
+    "name": "US Trip Tracker 2026",
+    "short_name": "US Trip",
+    "description": "Track expenses during your US trip with real-time USD-IDR conversion",
     "start_url": "./",
     "scope": "./",
     "display": "standalone",
