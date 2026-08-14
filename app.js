@@ -579,6 +579,7 @@ const wishlistElements = {
     productName: document.getElementById('product-name'),
     productStore: document.getElementById('product-store'),
     productPrice: document.getElementById('product-price'),
+    productCurrency: document.getElementById('product-currency'),
     productPricePreview: document.getElementById('product-price-preview'),
     productLink: document.getElementById('product-link'),
     productPriority: document.getElementById('product-priority'),
@@ -619,6 +620,7 @@ function setupWishlistListeners() {
 
     // Price preview
     wishlistElements.productPrice.addEventListener('input', updateWishlistPricePreview);
+    wishlistElements.productCurrency.addEventListener('change', updateWishlistPricePreview);
 
     // Filters
     wishlistElements.filterPriority.addEventListener('change', renderWishlist);
@@ -652,13 +654,15 @@ function openWishlistModal(item = null) {
         wishlistElements.itemId.value = item.id;
         wishlistElements.productName.value = item.name;
         wishlistElements.productStore.value = item.store || '';
-        wishlistElements.productPrice.value = item.price || '';
+        wishlistElements.productPrice.value = item.originalPrice || item.price || '';
+        wishlistElements.productCurrency.value = item.originalCurrency || 'USD';
         wishlistElements.productLink.value = item.link || '';
         wishlistElements.productPriority.value = item.priority;
         wishlistElements.productNotes.value = item.notes || '';
     } else {
         wishlistElements.modalTitle.textContent = 'Tambah Item';
         wishlistElements.itemId.value = '';
+        wishlistElements.productCurrency.value = 'USD';
     }
 
     updateWishlistPricePreview();
@@ -672,11 +676,24 @@ function handleWishlistSubmit(e) {
     e.preventDefault();
 
     const id = wishlistElements.itemId.value || generateId();
+    const originalPrice = parseFloat(wishlistElements.productPrice.value) || 0;
+    const originalCurrency = wishlistElements.productCurrency.value;
+    
+    // Convert to USD for consistent calculations
+    let priceUSD;
+    if (originalCurrency === 'USD') {
+        priceUSD = originalPrice;
+    } else {
+        priceUSD = originalPrice / APP_STATE.exchangeRate;
+    }
+    
     const item = {
         id,
         name: wishlistElements.productName.value.trim(),
         store: wishlistElements.productStore.value.trim(),
-        price: parseFloat(wishlistElements.productPrice.value) || 0,
+        price: Math.round(priceUSD * 100) / 100,
+        originalPrice,
+        originalCurrency,
         link: wishlistElements.productLink.value.trim(),
         priority: wishlistElements.productPriority.value,
         notes: wishlistElements.productNotes.value.trim(),
@@ -726,12 +743,20 @@ function deleteWishlistItem(id) {
 
 function updateWishlistPricePreview() {
     const price = parseFloat(wishlistElements.productPrice.value) || 0;
+    const currency = wishlistElements.productCurrency.value;
+    
     if (price === 0) {
         wishlistElements.productPricePreview.textContent = '';
         return;
     }
-    const idr = price * APP_STATE.exchangeRate;
-    wishlistElements.productPricePreview.textContent = `≈ ${formatIDR(idr)}`;
+    
+    if (currency === 'USD') {
+        const idr = price * APP_STATE.exchangeRate;
+        wishlistElements.productPricePreview.textContent = `≈ ${formatIDR(idr)}`;
+    } else {
+        const usd = price / APP_STATE.exchangeRate;
+        wishlistElements.productPricePreview.textContent = `≈ ${formatUSD(usd)}`;
+    }
 }
 
 function renderWishlistSummary() {
