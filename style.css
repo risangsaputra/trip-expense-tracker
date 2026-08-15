@@ -47,31 +47,40 @@ body {
     padding-bottom: 100px;
 }
 
-/* Header - iOS Style */
+/* Header - USA/SFO Style */
 .header {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: 
+        linear-gradient(135deg, rgba(30, 58, 138, 0.92) 0%, rgba(127, 29, 29, 0.88) 100%),
+        url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 400"><defs><linearGradient id="sky" x1="0%25" y1="0%25" x2="0%25" y2="100%25"><stop offset="0%25" style="stop-color:%231e3a5f"/><stop offset="100%25" style="stop-color:%234a1942"/></linearGradient></defs><rect fill="url(%23sky)" width="800" height="400"/><g fill="%23fff" opacity="0.1"><rect x="50" y="280" width="8" height="120"/><rect x="46" y="260" width="16" height="25"/><rect x="100" y="250" width="12" height="150"/><rect x="95" y="230" width="22" height="25"/><rect x="150" y="200" width="30" height="200"/><rect x="148" y="195" width="34" height="10"/><rect x="155" y="210" width="5" height="80"/><rect x="170" y="210" width="5" height="80"/><rect x="200" y="270" width="15" height="130"/><rect x="250" y="180" width="40" height="220"/><rect x="255" y="185" width="8" height="15" rx="4"/><rect x="270" y="185" width="8" height="15" rx="4"/><rect x="255" y="210" width="8" height="15" rx="4"/><rect x="270" y="210" width="8" height="15" rx="4"/><rect x="255" y="235" width="8" height="15" rx="4"/><rect x="270" y="235" width="8" height="15" rx="4"/><rect x="300" y="300" width="10" height="100"/><rect x="350" y="220" width="25" height="180"/><rect x="400" y="160" width="50" height="240"/><rect x="410" y="170" width="10" height="20" rx="2"/><rect x="430" y="170" width="10" height="20" rx="2"/><rect x="410" y="200" width="10" height="20" rx="2"/><rect x="430" y="200" width="10" height="20" rx="2"/><rect x="480" y="280" width="20" height="120"/><rect x="530" y="190" width="35" height="210"/><rect x="590" y="250" width="15" height="150"/><rect x="640" y="220" width="45" height="180"/><rect x="700" y="270" width="12" height="130"/><rect x="750" y="300" width="8" height="100"/><path d="M 0 380 Q 200 350 400 380 T 800 380 L 800 400 L 0 400 Z" opacity="0.15"/></g><g fill="%23FFD700" opacity="0.6"><circle cx="700" cy="80" r="3"/><circle cx="650" cy="120" r="2"/><circle cx="720" cy="150" r="2"/><circle cx="600" cy="60" r="2"/><circle cx="750" cy="100" r="2.5"/><circle cx="680" cy="180" r="1.5"/><circle cx="550" cy="90" r="2"/><circle cx="500" cy="130" r="1.5"/><circle cx="450" cy="70" r="2"/><circle cx="350" cy="100" r="1.5"/><circle cx="300" cy="60" r="2"/><circle cx="200" cy="90" r="1.5"/><circle cx="150" cy="120" r="2"/><circle cx="100" cy="70" r="1.5"/><circle cx="50" cy="100" r="2"/></g><g fill="%23fff" opacity="0.08"><path d="M 380 140 L 420 140 L 450 160 L 420 160 L 420 200 L 380 200 L 380 160 L 350 160 Z"/></g></svg>');
+    background-size: cover;
+    background-position: center bottom;
     color: white;
-    padding: 20px;
+    padding: 24px 20px;
     padding-top: 60px;
     text-align: center;
     position: relative;
     overflow: hidden;
+    min-height: 140px;
 }
 
 .header::before {
     content: '';
     position: absolute;
-    top: -50%;
-    left: -50%;
-    width: 200%;
-    height: 200%;
-    background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 60%);
-    animation: shimmer 15s infinite linear;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(180deg, transparent 0%, rgba(0,0,0,0.1) 100%);
+    pointer-events: none;
 }
 
-@keyframes shimmer {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
+.header::after {
+    content: '🌉';
+    position: absolute;
+    bottom: 45px;
+    right: 20px;
+    font-size: 2rem;
+    opacity: 0.3;
 }
 
 .header h1 {
